@@ -2,9 +2,10 @@
 namespace list
 {
 
-    class StringList
+    class StringList : IComparable<StringList>
     {
         private readonly string list;
+
 
         public StringList(string list, bool convertAllElemntsToSingleton)
         {
@@ -94,7 +95,7 @@ namespace list
         {
             string outStr = "";
             int idx = 0;
-            while(idx < str.Length)
+            while (idx < str.Length)
             {
                 //check is digit
                 if (str[idx] >= '0' && str[idx] <= '9')
@@ -103,22 +104,23 @@ namespace list
                     //run along the element untill reaching the end
                     //Store the element string to avoid having to backtrack
                     string elem = "";
-                    int elemStartidx =idx;
-                    while(str[idx] >= '0' &&  str[idx] <= '9')
+                    int elemStartidx = idx;
+                    while (str[idx] >= '0' && str[idx] <= '9')
                     {
-                        elem+=str[idx];
+                        elem += str[idx];
                         idx++;
                     }
 
                     //check if elements is in a singleton list
-                    if(!(str[elemStartidx-1] == '[' && str[idx] ==']'))
+                    if (!(str[elemStartidx - 1] == '[' && str[idx] == ']'))
                     {
                         outStr += "[" + elem + "]";
                     }
-                    else{
-                        outStr+=elem;
+                    else
+                    {
+                        outStr += elem;
                     }
-                    
+
 
                 }
                 else
@@ -183,17 +185,76 @@ namespace list
         }
 
 
-        public string GetList()
+        public override string ToString()
         {
             return list;
         }
 
-       
+        public int CompareTo(StringList other)
+        {
+
+            int compRes = 0;
+
+            int i = 0;
+            while (compRes == 0)
+            {
+
+
+                string elem1 = getElementAt(i);
+                bool iss1Int = int.TryParse(elem1, out int res1);
+
+
+
+                string elem2 = other.getElementAt(i);
+                bool iss2Int = int.TryParse(elem2, out int res2);
+
+                //if both are integers compare
+                if (iss1Int && iss2Int)
+                {
+                    if (res1 < res2)
+                    {
+                        return -1;
+                    }
+                    if (res1 == res2)
+                    {
+                        return 0;
+                    }
+                    return 1;
+                }
+
+                //if one is null, the list is empty so result can be determined
+                if ((elem1 == "" || elem1 == null) && elem2 != null)
+                {
+                    return -1;
+                }
+                if (elem1 != null && (elem2 == null || elem2 == ""))
+                {
+                    return 1;
+                }
+                if ((elem1 == null || elem1 == "") && (elem2 == null || elem2 == ""))
+                {
+                    return 0;
+                }
+
+
+                //both are not integers, If one is an integer convert it to a list
+                if (iss1Int)
+                {
+                    elem1 = '[' + elem1 + ']';
+                }
+                //both are not integers, If one is an integer convert it to a list
+                if (iss2Int)
+                {
+                    elem2 = '[' + elem2 + ']';
+                }
+
+                compRes = new StringList(elem1, false).CompareTo(new StringList(elem2, false));
+
+                i++;
+            }
+
+            return compRes;
+        }
     }
 
-
-
 }
-
-
-
